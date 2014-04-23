@@ -10,9 +10,12 @@
 ## Intermediate documents:
 *.dvi
 # these rules might exclude image files for figures etc.
-# *.ps
-# *.eps
-# *.pdf
+#*.ps
+#*.eps
+#*.pdf
+#*.png
+#*.jpg
+#*.bmp
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
@@ -87,3 +90,6 @@ sympy-plots-for-*.tex/
 
 # xindy
 *.xdy
+
+#no temp data
+*.*~
