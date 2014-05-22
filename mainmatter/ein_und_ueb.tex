@@ -1,11 +1,15 @@
 \chapter{Einleitung und Übersicht}
-\textit{Datenbankverwaltungssysteme} (DBMS) gewinnen dank der digitalen Vernetzung und Kommunikation immer mehr an Bedeutung und sind heutzutage nicht mehr aus unserem Alltag wegzudenken. Zwar bemerken viele den Einsatz eines DBMS nicht jedoch sind diese Systeme überall vertreten z.B. in Versicherungen, Banken, Universitäten (welche das Hauptbeispiel für diese Vorlesung bildet) noch bei vermeintlich nicht aufwendigen Blogs wie einem einfachem Blog.\\
+\textit{Datenbankverwaltungssysteme} (DBMS) gewinnen dank der digitalen Vernetzung und Kommunikation immer mehr an Bedeutung und sind heutzutage nicht mehr aus unserem Alltag wegzudenken. Zwar bemerken viele den Einsatz eines DBMS nicht jedoch sind diese Systeme überall
+
+\section{Empfohlene Lektüre:}
+Für die Vorlesung wird das folgende Buch dringend empfohlen, da sich die Vorlesung an diesem orientieren wird. \\ vertreten z.B. in Versicherungen, Banken, Universitäten (welche das Hauptbeispiel für diese Vorlesung bildet) noch bei vermeintlich nicht aufwendigen Blogs wie einem einfachem Blog.\\
 Ein Datenbankverwaltungssystem besteht aus einer Menge von \textit{Daten} und dem \textit{Datenbankverwaltungssystem} 
 \begin{itemize}
 	\item Die \textit{Daten} werden auch als Datenbasis bezeichnet welche in einer gewissen Beziehung zueinander stehen. 
 	\item Die Programme zum Zugriff, Modifikation und Kontrolle genutzt werden, werden als \textit{Datenbankverwaltungssystem} bezeichnet
 \end{itemize}
-Diese Trennung wird häufig unterlassen, um eine Verwirrung zu vermeiden. Stattdessen werden Datenbankverwaltungssysteme ( auch Datenbanksysteme) als Kombination der vorher genannten Unterschiede bezeichnet. 
+Diese Trennung wird häufig unterlassen, um eine Verwirrung zu vermeiden. Stattdessen werden Datenbankverwaltungssysteme (auch Datenbanksysteme) als Kombination der vorher genannten Unterschiede bezeichnet. 
+
 \section{Motivation für ein DBMS}
 Es gibt einige Probleme wenn Firmen oder Organisationen auf ein DBMS verzichten müssten und auf Papier (Karteikarten, Akten, \dots) oder separate Dateien zurück greifen müssten. 
 \begin{description}
@@ -24,3 +28,26 @@ Es gibt einige Probleme wenn Firmen oder Organisationen auf ein DBMS verzichten 
   \item[hohe Entwicklungskosten für Anwendungsprogramme:] \hfill \\
   	Anwendungsentwickler müssen sich meist mit einem Teil der vorher genannten Probleme auseinandersetzen um Informationen zu speichern und zu verwalten. Ein DBMS bietet eine einfache und erprobte Möglichkeit diese Probleme direkt zu erledigen.
 \end{description}
+
+\section{Die Abstraktionsebenen eines Datenbanksystems}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.45\linewidth]{./mainmatter/pics/sichten}
+\caption[Abstraktionsebenen]{Drei Abstraktionsebenen eines Datenbanksystems}
+\label{fig:sichten}
+\end{figure}
+Bei einem DBMS unterscheidet man drei Abstraktionsebenen(siehe Abbildung \ref{fig:sichten}).
+\begin{description}
+\item[Die physische Ebene:] Auf dieser Ebene wird festgelegt, wie die Daten gespeichert sind. Im Allgemeinen sind die Daten auf einem Speichermedium (meistens als Plattenspeicher realisiert) abgelegt. 
+\item[Die logische Ebene:] Auf der logischen Ebene wird in einem sogenannten \textit{Datenbankschema} festgelegt, welche Daten abgespeichert sind. 
+\item[Die Sichten:] Während das Datenbankschema der logischen Ebene ein integriertes Modell der gesamten Informationsmenge des jeweiligen Anwendungsbereichs (z.B. des gesamten Unternehmens) darstellt, werden in den Sichten Teilmenge der Informationen bereitgestellt. Diese Sichten sind auf Benutzer bzw. Benutzergruppen zugeschnitten, die lediglich diese Sichten benötigen. Denn nicht jeder Benutzer benötigt alle Daten die existieren.
+\end{description}
+
+\section{Datenunabhängigkeit}
+Durch die drei Ebenen wird eine Datenunabhängigkeit erreicht, welche zu wohl definierten Schnittstellen führt, ermöglicht es die Realisierung der Datenbank zu variieren ohne die Benutzer der Schnittstellen in Mitleidenschaft zu ziehen. Aus den drei Schichten ergeben sich zwei Stufen der Datenunabhängigkeit im DBMS
+\begin{description}
+\item[Physische Datenunabhängigkeit:] Die Modifikation der physischen Speicherstruktur belässt die logische Ebene (also das Datenbankschema) invariant. Z.B. erlauben fast alle Datenbanksysteme das nachträgliche Anlegen eines Indexes, um die Datenbankobjekte schneller finden zu können. Dies darf keinen Einfluss au bereits existierende Anwendungen in der logischen Ebene haben. Es sollte lediglich die Effizienz positiv beeinflussen.
+\item[Logische Datenunabhängigkeit:] Die Anwendungen nehmen stets Bezug auf die logische Struktur der Datenbasis. Bei Änderungen der logischen Ebene (des Datenbankschemas) können diese in den Sichten vor dem Anwender verborgen werden. Dadurch wird zu einem gewissen Grad eine logische Datenbankunabhängigkeit erzielt. 
+\end{description}
+Die heutigen Datenbanksysteme erfüllen mindestens die physische Datenbankunabhängigkeit. Die logische Datenunabhängigkeit kann schon rein konzeptuell nur für einfachste Modifikationen des Datenbankschemas gewährleistet werden. 
+\section{Datenmodellierung}
