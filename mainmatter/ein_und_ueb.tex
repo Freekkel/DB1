@@ -45,9 +45,70 @@ Bei einem DBMS unterscheidet man drei Abstraktionsebenen(siehe Abbildung \ref{fi
 
 \section{Datenunabhängigkeit}
 Durch die drei Ebenen wird eine Datenunabhängigkeit erreicht, welche zu wohl definierten Schnittstellen führt, ermöglicht es die Realisierung der Datenbank zu variieren ohne die Benutzer der Schnittstellen in Mitleidenschaft zu ziehen. Aus den drei Schichten ergeben sich zwei Stufen der Datenunabhängigkeit im DBMS
+
 \begin{description}
-\item[Physische Datenunabhängigkeit:] Die Modifikation der physischen Speicherstruktur belässt die logische Ebene (also das Datenbankschema) invariant. Z.B. erlauben fast alle Datenbanksysteme das nachträgliche Anlegen eines Indexes, um die Datenbankobjekte schneller finden zu können. Dies darf keinen Einfluss au bereits existierende Anwendungen in der logischen Ebene haben. Es sollte lediglich die Effizienz positiv beeinflussen.
+
+\item[Physische Datenunabhängigkeit:] Die Modifikation der physischen Speicherstruktur belässt die logische Ebene (das Datenbankschema) invariant. Z.B. erlauben fast alle Datenbanksysteme das nachträgliche Anlegen eines Indexes, um die Datenbankobjekte schneller finden zu können. Dies darf keinen Einfluss au bereits existierende Anwendungen in der logischen Ebene haben. Es sollte lediglich die Effizienz positiv beeinflussen.
 \item[Logische Datenunabhängigkeit:] Die Anwendungen nehmen stets Bezug auf die logische Struktur der Datenbasis. Bei Änderungen der logischen Ebene (des Datenbankschemas) können diese in den Sichten vor dem Anwender verborgen werden. Dadurch wird zu einem gewissen Grad eine logische Datenbankunabhängigkeit erzielt. 
+
 \end{description}
+
 Die heutigen Datenbanksysteme erfüllen mindestens die physische Datenbankunabhängigkeit. Die logische Datenunabhängigkeit kann schon rein konzeptuell nur für einfachste Modifikationen des Datenbankschemas gewährleistet werden. 
+
 \section{Datenmodellierung}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.55\linewidth]{./mainmatter/pics/modell}
+\caption{Datenmodellierung}
+\label{fig:modell}
+\end{figure}
+
+Datenbankverwaltungssysteme basiert auf einem so genannten Datenmodell. Das Datenmodell stellt die Infrastruktur für die Modellierung der realen Welt zur Verfügung. Das Datenmodell beinhaltet die Möglichkeit zur 
+
+\begin{itemize}
+\item Beschreibung der Datenobjekte und zur
+\item Festlegung der anwendbaren Operatoren und deren Wirkung
+\end{itemize}
+
+Das Datenmodell legt somit die generischen Strukturen und Operatoren fest, die man zur Modellierung einer bestimmten Anwendung ausnutzen kann. Eine Programmiersprache legt die Typkonstruktoren und Sprachkonstrukte fest, mit deren Hilfe man spezifische Anwendungsprogramme realisiert. 
+
+\begin{tabbing}
+\qquad \= Das Datenmodell besteht demnach aus zwei Teilsprachen: 
+\end{tabbing}
+
+\begin{enumerate}
+\item der \textit{Datendefinitionssprache} (engl. \textit{Data Definition Langauge}, DDL)
+\item der \textit{Datenmanipulationssprache} (engl. \textit{Data Manipulation Langauge}, DML)
+\end{enumerate}
+
+Die DDL wird benutzt, um die Struktur der abzuspeichernden Datenobjekte zu beschreiben. Die Strukturbeschreibung aller Datenobjekte des betrachteten Anwendungsbereichs nennt man das Datenbankschema. 
+
+\begin{tabbing}
+\qquad \= Die Datenmanipulationssprache (DML) besteht aus
+\end{tabbing}
+
+\begin{itemize}
+\item der \textit{Anfragesprache} (engl. \textit{Query Language})
+\item der \glqq eigentlichen\grqq Datenmanipulationssprache zur Änderung von abgespeicherten Datenobjekten, zum Einfügen von Daten und zum Löschen von gespeicherten Daten.
+\end{itemize}
+
+Die DML (einschließlich der Anfragesprache) kann in zwei unterschiedlichen Arten genutzt werden:
+
+\begin{itemize}
+\item \textit{interaktiv}, indem DML-Kommandos direkt am Arbeitsplatzrechner (oder Terminal) eingegeben werden
+\item in einem Programm einer höheren Programmiersprache, das \glqq eingebettet \grqq DML-Kommandos enthält.
+\end{itemize}
+
+\section{Logische Datenmodelle}
+\begin{itemize}
+\item Netzwerkmodell
+\item Hierachisches Datenmodell
+\item Relationales Datenmodell
+\item XMl Schema
+\item Objektorintiertes Datenmodell
+\begin{itemize}
+\item Objektrealtionales Schema
+\end{itemize}
+\item Deduktives Datenmodell
+\end{itemize}
