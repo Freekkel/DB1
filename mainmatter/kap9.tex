@@ -1,0 +1,37 @@
+\chapter{Transaktionsverwaltung}
+Grundlegende Anforderungen an Transkationen:
+\begin{enumerate}
+\item Recovery, d.h. die Behebung von eingetretenen, oft unvermeidbaren Fehlersituationen
+\item Synchronisation von mehreren gleichzeitig auf der Datenbank ablaufenden Transaktionen. 
+\end{enumerate}
+\section{Operationen auf Transaktionsebene}
+\begin{description}
+\item[begin of transaction (BOT)] Mit diesem Befehl wird der Beginn einer Transaktion dargestellt.
+\item[commit] Hierdurch wrid die Beendigung der Transaktion eingeleitet. Alle Änderungen der Datenbasis werden durch diesen Befehl \textbf{festgeschrieben}.
+\item[abort] Dieser Befehl führt zu einem Selbstabbruch der Transaktion. Das Datenbanksystem stellt sicher, dass der ursprüngliche Zustand wieder erreicht wird. 
+\item[define savepoint] An diesem Punkt in einer Transaktion wird ein Sicherungspunkt angelegt, an dem später wieder eingestiegen werden kann. Die Änderungen werden aber noch nicht in die Datenbank geschrieben. 
+\item[backup transaction] Dieser Befehl dient dazu, die noch aktive Transaktion auf den jüngsten savepoint zurück zu setzen und dort weiter zu arbeiten.
+\end{description}
+\section{Eigenschaften von Transaktionen}
+\begin{description}
+\item[Atomicity (Atomarität)] Alles oder nichts Prinzip. Die Transaktion ist nicht weiter zerlegbar und wird kompleet oder gar nicht ausgeführt.
+\item[Consistency] Eine Transaktion einen Konsistenten Datenbasiszustand, ansonsten wird diese zurückgesetzt. Zwischenzustand darf inkonsistent sein, sonst nie. 
+\item[Isolation] Keine Beeinflussung von parallel Laufenden Transaktionen. Alle anderen parallel ausgeführten Transaktionen bzw. deren Effekte dürfen nicht sichtbar sein.
+\item[Durability (Dauerhaftigkeit)] Die Wirkung einer erfolgreich abgeschlossenen Transaktion bleibt dauerhaft in der Datenbank erhalten. Nur eine weitere Transaktion kann diese rückgängig machen. 
+\end{description}
+\section{Transaktionsverwaltung in SQL}
+\begin{description}
+\item[commit work] Änderungen werden comitted keine Rückmeldung
+\item[rollback work] Alle Änderungen werden zurück gesetzt. Rückmeldung vorgeschrieben. 
+\end{description}
+\section{Zustandsübergänge einer Transaktion}
+\begin{description}
+\item[potentiell] Codiert und wartet auf die Ausführung
+\item[aktiv] wird aktuell ausgeführt. 
+\item[wartend] Bei Überlast in wartenden Zustand verdrängt. 
+\item[abgeschlossen] Durch commit beendete aktive Transaktion.
+\item[persistent] Die Änderungen wurden in die Datenbank geschrieben
+\item[gescheitert] Abbruch führt in diesen Zustand. 
+\item[wiederholbar] Falls Transaktion wiederholbar ist, versuche dies erneut nach zurücksetzen der Datenbasis.
+\item[aufgegeben] eine gescheiterte Transaktion ist hoffnungslos und alle Änderungen werden zurückgesetzt. Danach wird in den Zustand aufgegeben gewechselt.
+\end{description}

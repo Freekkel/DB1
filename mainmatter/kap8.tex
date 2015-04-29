@@ -1,0 +1,27 @@
+\chapter{Anfragebearbeitung}
+\section{Aquivalenzen in der relationalen Algebra}
+\begin{enumerate}
+\item Join, Vereinigung, Schnitt und Kreuzprodukt sind kommutativ und assoziativ
+\item Selektionen sind untereinander vertauschbar
+\item $\wedge$ in einer Selektionsbedingung können in mehrere Selektionen aufgebrochen bzw. nacheinander ausgeführte Selektionen können durch $\wedge$ zusammengefügt werden. 
+\item Geschachtelte Projektionen können auf die äußere beschränkt werden.
+\subitem Dabei gilt es zu beachten, dass die Projektion und alle vorherigen eine Submenge des Schemas sein müssen.
+\item Eine Selekteion kann an einer Projektion \grqq vorbeigeschoben\glqq ~ werden, falls die Projektion keine Attribute aus der Selektionsbedingung entfernt
+\item Eine selektion kann an einer Joinoperation (oder Kreuzprodukt) vorbeigeschoben werden, falls sie nur Attribute eines der beiden Join-Argumente verwendet. 
+\item 
+\item Selektion auf eine fertige Mengenoperation (Vereinigung, Schnitt und Differenz) = Selektion auf teile und dann Mengenoperation
+\item Bei Projektionen nur bei Vereinigung möglich
+\item Selektion + Kreuzprodukt = Join mit Selektionsbedingung. 
+\item DeMorgans Gesetz: 
+\[\neg(p_1 \vee p_2) = \neg p_1 \wedge \neg p_2 \]
+\[\neg(p_1 \wedge p_2) = \neg p_1 \vee \neg p_2\]
+\end{enumerate}
+\section{Anwendung der Transformationsregeln}
+\begin{enumerate}
+\item Aufbrechen von Selektionen
+\item Verschieben der Selektionen soweit wie möglich nach unten im Operatorbaum
+\item Zusammenfassen von Selektionen und Kreuzprodukten zu Joins
+\item Bestimmung der Reihenfolge der Joins in der Form, dass möglichst kleine Zwischenergebnisse entstehen.
+\item unter Umständen Einfügen von Projektionen
+\item Verschieben der Projektionen soweit wie möglich nach unten im Operatorbaum
+\end{enumerate}

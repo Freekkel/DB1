@@ -1,0 +1,299 @@
+\chapter{SQL}
+\section{Datentypen}
+\begin{lstlisting}
+date			// Datum
+char(x)			// Zeichenkette wird mit Leerzeichen aufgefuellt
+varchar(x)		// Zeichenkette wird NICHT aufgefuellt
+numeric(p,s)		// Zahl p = totale laenge s =  # nachkommastellen
+integer / int
+float
+blob / raw		// fuer binaer Dateien
+xml			// fuer XML Dateien
+\end{lstlisting}
+
+\section{Schemadefinition CREATE TABLE}
+\begin{lstlisting}
+CREATE TABLE Professoren(
+  PersNr integer primary key,
+  Name varchar(30) NOT NULL,
+  Rang char(2) check (Rang in ('C2', 'C3', 'C4')),
+  Raum integer unique,
+);
+CREATE TABLE pruefen(
+  MatrNr integer references Studenten on delete cascade,
+  VarlNr integer references Vorlesungen,
+  PersNr integer,
+  Note numer(2,1) check (Note between 0.7 and 5.0),
+  primary key (MatrNr, VorlNr),
+  foreign key (PersNr) references Professoren on delete set null
+  constraint VorherHoeren
+  	check(exists(select *
+  			from hoeren h
+  			where h.VorlNr = pruefen.VorlNr and
+  			      h.MatrNr = pruefen.MatrNr))
+);
+\end{lstlisting}
+\qquad \\
+\section{Schemaveränderungen ALTER}
+\begin{lstlisting}
+ALTER TABLE tabellenname 
+	add (Attribut Datentyp);
+	add column Attribut Datentyp;
+	modify (Attribut Datentyp); // Bedingungen wie NOT NULL bleiben erhalten.
+	alter column Attribut Datentyp;
+\end{lstlisting}
+
+\section{Einfügen INSERT INTO}
+\begin{lstlisting}
+INSERT INTO Studenten (MatrNr, Name)
+	values (28121, 'Archimedes');
+
+INSERT INTO hoeren
+	SELECT MatrNr, VorlNr
+	FROM Studenten, Vorlesungen
+	WHERE Titel = 'Logik';
+\end{lstlisting}
+\qquad\\
+\section{Datenmanipulation DELETE UPDATE}
+\begin{lstlisting}
+DELETE FROM Studenten
+	WHERE Semester > 13;
+	
+DELETE FROM voraussetzen
+	WHERE Vorgaenger in (SELECT Nachfolger 
+			      FROM voraussetzen);
+
+UPDATE Studenten 
+	SET Semester = Semester +1;
+\end{lstlisting}
+\section{Anfragen SELECT}
+\begin{lstlisting}
+SELECT DISTINCT Rang // zeige elemente der select Menge
+	FROM Professoren;
+
+SELECT PersNr, Name
+	FROM Professoren
+	WHERE Rang = 'C4'
+	order by Rang desc, Name asc
+\end{lstlisting}
+SELECT = $\Pi$ \qquad FROM = $\times$ \qquad WHERE = $\sigma$\\
+\newpage
+\subsection{Joins}
+\begin{lstlisting}
+Implizite:
+
+SELECT s.Name
+FROM Studenten s, hoeren h, Vorlesungen v, Professoren p
+WHERE s.MatrNr = h.MatrNr AND h.VorlNr = v.VorlNr 
+AND p.PersNr = v.gelesenVon AND p.Name = 'Curie';
+
+Explizit:
+
+SELECT p.PersNr, p.Name, f.PersNr, f.Note, f.MatrNr, s.MatrNr, s.Name
+	from Professoren  p join ( pruefen f join Studenten s 
+	on f.MatrNr = s.MatrNr)
+	on p.PersNr = f.PersNr;
+\end{lstlisting}
+\subsection{Gruppierung und Aggregation}
+Gruppierung von Werten mit einem Wert durch avg, max, min, sum, count
+\begin{lstlisting}
+SELECT gelesenVon, Name, sum(sws)
+	FROM Vorlesungen
+	WHERE gelesenVon = PersNr and Rang = 'C4'
+	Group by gelesenVon, Name
+		Having avg(SWS) >= 3;
+\end{lstlisting}
+In der Select-Klausel dürfen nur Aggregatfunktionen oder Attribute, nach denen gruppiert wurde verwendet werden. Somit muss Name auch in die Group by - Klausel (weil nur ein Tupel pro Gruppe vorhanden ist)
+\subsection{Geschachtelte Anfragen}
+Zu unterscheiden sind dabei Anfragen, die nur ein Tupel zurückliefern und Anfragen, die mehrere Tupel liefern. \\Wird nur ein Tupel geliefert kann in Select-klausel oder where-Klausel Schachtelung verwendet werden, bei denen ein skalarer Wert gefordert wird.\\
+\begin{lstlisting}
+Select *
+From pruefen
+Where Note = ( select avg(Note)
+		From pruefen);
+
+Select PersNr, Name, (	select sum(SWS) as Lehrbelastung
+			From Vorlesungen
+			Where gelesenVon = PersNr)
+From Professoren
+\end{lstlisting}
+\begin{description}
+\item[Erste Anfrage:] ist eigenständig, verwendet nur ihre eigenen Attribute, sie wird nur einmal ausgewertet
+\item[Zweite Anfrage:] ist korreliert, sie verwendet Attribute aus ihrer äußeren Hülle und muss so für jedes Tupel neu durchgeführt werden (für jedes zu überprüfende Tupel, wenn Unteranfrage in where-Bedingung steht und jedes auszugebende Tupel, wenn sie in select-klausel steht)
+\end{description}
+
+Noch ein Beispiel:
+\begin{lstlisting}
+
+Select s.*			// korreliert
+From Studenten
+Where exists (select p.*
+		From Professoren
+		Where p.GebDatum < s.GebDatum);
+
+Select s.*			// unkorreliert
+From Studenten
+Where s.GebDatum < (select max(p.Gebdatum)
+			From Professoren p);
+\end{lstlisting}
+Noch ein Beispiel (nur durch Join kann Anfrage unkorreliert werden):
+\begin{lstlisting}
+Select a.*
+From Assistenten
+Where exists (	select p.*
+		From Professoren
+		Where p.PersNr = a.Boss and p.GebDatum > a.GebDatum);
+
+Select a.*
+From Assistenten a, Professoren p
+Where a.GebDatum < p.GebDatum and a.Boss = p.PersNr;
+\end{lstlisting}
+\subsection{Schachtelung im From-Teil (Bilden einer neuen Relation):}
+\begin{lstlisting}
+Select tmp.MatrNr, tmp.Name, tmp.VorlAnzahl
+	From (	select s.MatrNr, s.Name, count(*) as VorlAnzahl
+		From Studenten s, hoeren h
+		Where s.MatrNr = h.MatrNr
+		Group by s.MatrNr, s.Name) tmp
+	Where tmp.VorlAnzahl > 2;
+
+
+
+Select h.VorlNr, h.StudProVorl, g.GesStud, h.StudProVorl / 
+g.GesStud as Marktanteil
+	From 	(select VorlNr, count(*) as StudProVorl
+			From hoeren h
+			Group by VorlNr; ) h,
+		    (select count(*) as GesStud
+			From Studenten s ) g;
+\end{lstlisting}
+\newpage
+\subsection{Modularisierung von Anfragen with}
+Das Keyword with generiert temporäre Sichten für die Dauer der Abfragebearbeitung. Dadurch können Anfragen übersichtlicher werden. 
+\begin{lstlisting}
+with h as (select VorlNr, count(*) as StudProVorl
+			From hoeren h
+			Group by VorlNr )
+     g as (select count(*) as GesStud
+				From Studenten s )
+
+Select h.VorlNr, h.StudProVorl, g.GesStud, h.StudProVorl / 
+g.GesStud as Marktanteil
+	From h, g;
+\end{lstlisting}
+
+\subsection{Mengenoperationen union, intersect, except}
+\begin{lstlisting}
+(SELECT Name			
+ FROM Assistenten)			
+UNION
+(SELECT Name			
+ FROM Professoren);
+ 
+ SELECT Name
+ FROM Professoren
+ WHERE PersNr not in (SELECT gelesenVon
+ 		from Vorlesungen);
+\end{lstlisting}
+
+\subsection{Quantifizierte Anfrage}
+\begin{itemize}
+\item in ist äquivalent zu any
+\item any und all sind quantifizierende Bedingungen mit Vergleichsoperatoren
+\item any testet, ob es mindestens ein Element im Ergebnis der Unteranfrage gibt, für das der Vergleich mit linkem Argument erfüllt ist
+\item all prüft ob alle Elemente die Bedingung erfüllen -> allerdings ist all nicht der Allquantor aus den beschreibenden Sprachen
+\end{itemize}
+\begin{lstlisting}
+Select Name
+from Studenten 
+where Semester >= all ( 
+	select Semester
+	from Studenten );	// effizienter waere hier der max-Operator
+\end{lstlisting}
+\subsubsection{Existenzquantifizierer}
+\begin{lstlisting}
+select Name
+from Professoren
+where not exists (select *
+		from Vorlesungen
+		where gelesenVon = PersNr);
+\end{lstlisting}
+\subsubsection{Allquantifizierung}
+Da es leider keinen Allquantor in SQl gibt, müssen solche Anfragen über einen Existenzquantor ausgedrückt werden. Nachfolgend ein Beispiel \\
+\qquad\\
+$\{s~|~s\in Studenten \wedge \forall v \in Vorlesungen ( v.SWS = 4\Rightarrow \\ \exists h \in hoeren ( h.VorlNr = v. VorlNr \wedge h.MatrNr = s.MatrNr)) \}$\\
+\qquad\\
+Umformen mit Hilfe von:\\
+\[\begin{array}{lcl}
+\forall t\in R(P(t)) &=& \neg(\exists t \in R(\neg P(t))) \\
+R \Rightarrow T &=& \neg R \vee T\\
+\end{array}\]
+$\{s~|~s\in Studenten \wedge \neg (\exists v \in Vorlesungen \neg(\neg( v.SWS = 4 )\vee \\ \exists h \in hoeren ( h.VorlNr = v. VorlNr \wedge h.MatrNr = s.MatrNr))) \}$\\
+\qquad \\
+Mit der Regel von De-Morgan die Negation nach innen ziehen:\\
+\qquad\\
+$\{s~|~s\in Studenten \wedge \neg (\exists v \in Vorlesungen ( v.SWS = 4 \wedge \\ \neg(\exists h \in hoeren ( h.VorlNr = v. VorlNr \wedge h.MatrNr = s.MatrNr)))) \}$\\
+\section{Null-Werte}
+Null wird zu unknown ausgewertet und hat teilweise ein seltsames Verhalten.\\
+
+\begin{tabular}{c|c}
+\textbf{not}  &  \\ 
+\hline true & false \\ 
+unknown & unknown \\ 
+ false & true \\ 
+\end{tabular} 
+\\\qquad\\
+\\\qquad\\
+\begin{tabular}{c|c|c|c}
+\textbf{and}  & true & unknown & false \\ 
+\hline true & unknown & false & false \\ 
+unknown & unknown & unknown & false \\ 
+ false & false & false & false \\ 
+\end{tabular} 
+\\\qquad\\
+\\\qquad\\
+\begin{tabular}{c|c|c|c}
+ \textbf{or} & true & unknown & false \\ 
+\hline true & true & true & true \\ 
+ unknown & true & unknown & unknown \\ 
+ false & true & unknown & false \\ 
+\end{tabular} 
+\section{Spezielle Sprachkonstrukte}
+\begin{lstlisting}
+select *
+	from Studenten
+	where Semester between 1 and 4;
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+select *
+	from Studenten
+	where Semester in (1,2,3,4);
+
+select *
+	from Studenten
+	where Name like 'T%eophrastos';
+
+select Matr, ( case when Note < 1.5 then 'sehr gut'
+		when Note < 2.5 then 'gut'
+		when Note < 3.5 then 'befriedigend'
+		when Note <= 4.0 then 'ausreichend'
+		else 'nicht bestanden' end)
+	from pruefen;
+\end{lstlisting}
+\section{Rekursionen}
+Rekursionen sind im aktuellen SQL 92 Standard nicht integriert und müssen daher immer explizit komplett ausgeschrieben werden. wie z.B.
+\begin{lstlisting}
+SELECT v1.Vorgaenger
+	FROM voraussetzen v1, voraussetzen v2, Vorlesungen v
+	WHERE v1.Nachfolger = v2.Vorgaenger and
+		v2.Nachfolger = v.VorlNr and
+		v.Titel = 'Der Wiener Kreis';
+\end{lstlisting}
+\section{Sichten}
+Sichten sind sehr nützlich, um Standardabfragen, welche über mehrere Tabellen gehen, welche sich nur sehr selten ändern zu verschnellern. Beispiel:
+\begin{lstlisting}
+CREATE VIEW pruefenSicht as
+	SELECT MatrNr, VorlNr, PersNr
+	FROM pruefen;
+\end{lstlisting}

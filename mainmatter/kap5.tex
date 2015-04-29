@@ -1,0 +1,28 @@
+\chapter{Datenintegrität}
+\section{Allgemein}
+Datenintegrität meint semantische Integritätsbedingungen, die sich aus der zu modellierenden Miniwelt ableiten $\rightarrow$ Modell soll Konsistenz der Daten gewährleisten\\
+Es gibt statische (Wertebereiche mit check zu realisieren) und dynamische (Update-Prüfung mit Trigger zu realisieren) Integritätsbedingungen\\
+Schlüssel haben Unique-Charakter, Kardinalitäten legen Beziehungen fest z. B. anhand von Fremdschlüsseln, jedes Attribut hat Domäne z. B. 5 Ziffern für Matrikelnummer\\
+Referentielle Integrität = ein Fremdschlüssel von R enthält entweder Null-Werte oder einen in S vorkommenden Primärschlüssel (auch mehrere Attribute als Schlüssel denkbar)\\
+\begin{itemize}
+\item in SQL durch unique, primary key $\rightarrow$ not null, foreign key $\rightarrow$ unique foreign key bezeichnet 1:1-Beziehung
+\item cascade $\rightarrow$ Änderungen Primärschlüssel bedingen Änderungen Fremdschlüssel, on delete cascade $\rightarrow$ zahlreiche Löschoperationen, on update/delete set null $\rightarrow$ keine kaskadierenden Löschoperationen
+\end{itemize}
+\section{Trigger}
+Diese ermöglichen das eine Datenbank bei Änderungen de Inhalts oder Schemas selbst aktiv wird und macht somit eine Datendank zu einer aktiven Datenbank. 
+\begin{lstlisting}
+create trigger keineDegradierung before update on Professoren
+for each row
+when (old.Rang is not null)
+begin
+	if :old.Rang = 'C3' and :new.Rang = 'C2' then
+		:new.Rang := 'C3';
+	end if;
+	if :old.Rang = 'C4' then
+		:new.Rang := 'C4';
+	end if;
+	if :new.Rang is null then
+		:new.Rang := :old.Rang;
+	end if;
+end
+\end{lstlisting}

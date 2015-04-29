@@ -1,0 +1,62 @@
+\chapter{Physische Datenorganisation}
+
+\section{ISAM}
+Index-Sequentieal Access Method\\
+
+Funktioniert wie SkipList nur ohne den Zufall und ist daher beim Einfügen recht aufwendig. 
+\begin{description}
+\item [Suchen:] Man macht eine Binärsuche auf den Indexseiten bis man die Stelle gefunden hat, die entweder der Wert ist oder wo der Wert dazwischen liegt.
+\item[Einfügen:] Leider sehr aufwendig. Wenn Datenseite füllt ist, muss ein Teil von dieser in die Indexseiten verschoben werden und eventuell eine neue Seite gebaut werden. wo die Daten drin stehen. 
+\item[Löschen:] Löschen ist solange einfach, bis die Datenseite leer ist, dann muss eventuell ein Indexseiten shift gemacht werden, um zu große Sprünge zu vermeiden, oder falls der Wert aus der Indexseite gelöscht wird, muss dieser Ersetzt werde.
+\end{description}
+
+\section{B-Baum}
+\begin{itemize}
+\item Die Knoten des Baumes sind meist auf eine Seite abgestimmt -> feste Grenzen für die Anzahl und Auslastung von Seitenzugriffen
+\item Grad eines Baumes bezeichnet die Anzahl der Einträge pro Knoten -> Grad k = minimal k Einträge, maximal 2k Einträge bis zur Verlagerung von Daten
+\item Hat ein Knoten n Einträge, hat er n+1 Kinder (außer Kinder)
+\end{itemize}
+\textbf{Einfügealgorithmus}
+\begin{enumerate}
+\item . Führe eine Suche nach dem Schlüssel durch; diese endet (scheitert) an der Einfügestelle.
+\item  Füge den Schlüssel dort ein.
+\item  Ist der Knoten überfüllt, teile ihn:
+\subitem 	Erzeuge einen neuen Knoten und belege ihn mit den Einträgen des überfüllten Knotens, deren Schlüssel größer ist als der des mittleren Eintrags.
+\subitem 	Füge den mittleren Eintrag im Vaterknoten des überfüllten Knotens ein.
+\subitem 	Verbinde den Verweis rechts des neuen Eintrags im Vaterknoten mit dem neuen Knoten.
+\item Ist der Vaterknoten jetzt überfüllt?
+\subitem 	Handelt es sich um die Wurzel, so lege eine neue Wurzel an.
+\subitem 	Wiederhole Schritt 3 mit dem Vaterknoten.
+\end{enumerate}
+\textbf{Löschen}\\
+\begin{itemize}
+\item Im Blatt einfach Löschen 
+\item Wert im Vaterknoten? Suche nächstkleineren / -größeren Wert und verschiebe diesen hoch. 
+\item verschmelze Kinder falls notwendig
+\end{itemize}
+\section{B$^{+}$ Baum}
+\begin{itemize}
+\item Die Daten werden nur noch in den Blättern gespeichert – somit reine Verzweigung und Zugriff erst im Blattknoten (auch: hohler Baum)
+\item Zusätzlich sind Blattknoten mit vor- und nachgelagerten Blättern verzweigt
+\item B+-Baum vom Typ (k, k*) hat also gleiche Wegelängen zum Blatt mit Datenzugriff
+\item Jeder Knoten hat k – 2k Einträge -> Blätter haben k* - 2k* Einträge
+\item Jeder Knoten mit n Einträgen außer Blättern hat n+1 Kinder
+\item Wartung ist einfacher, da nur Referenzen umgebogen werden müssen bei Zusammenlegungen, Löschungen in Knoten (Daten sind nur in den Blättern)
+\item AUCH: Präfix-B+-Baum = da nur Referenzen verwendet werden, können Synonyme bzw. kleine Schlüssel verwendet werden, z. B. Präfixe wie Chars für ganze String-Daten
+\end{itemize}
+
+\section{Hashing}
+
+\begin{itemize}
+\item Durch Hashfunktion h : S -> B wird Schlüssel auf Behälter abgebildet, der die Daten enthält.
+\item Da nicht für den gesamten Wertebereich des Schlüssels Platz vorhanden ist, werden Datensätze oft an gleichen Stellen gespeichert (Kollisionsbehandlung) -> h ist also nicht injektiv
+\item Oft verwendet / statisch!: Schlüsselwert mod Tabellengröße -> h(x) = x mod 3, wenn 3 Seiten verwendet werden -> Ergebnis ist 0, 1 oder 2
+\item Bei Überlauf einen Überlaufbehälter einfügen mit Verweisen auf diesen
+\end{itemize}
+
+\section{Erweiterbares Hashing}
+\begin{itemize}
+\item Hashfunktion verweist auf deutlich größeren Bereich und verweist nicht unbedingt auf einen tatsächlich vorhanden Behälter
+\item Nur ein Bruchteil des binären Funktionswertes wird als Index verwendet, z. B. die ersten 2 Bit, somit Abbildung auf 4 Seiten möglich
+\item h(x) = dp, wobei d die globale Tiefe ist in 2$^d$ gemessen, p ist der unbenutzte Teil, falls durch Überlauf neue Bereiche zugänglich gemacht werden müssen, dann z. B. Erweiterung zu 2$^3$ mit 8 Seiten
+\end{itemize}

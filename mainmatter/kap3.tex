@@ -1,0 +1,147 @@
+\chapter{Das relationale Modell}
+\section{relationales Schema}
+Darstellung von Entitytypen:
+
+Student:\{[\underline{MatNr: integer}, Name:string, Semester: integer]\}\\
+\qquad\\
+Allgemein:
+
+Entityname (Tabellenname) : \{[ x:y | x = Attributbeschreibung; y = Datentyp]\}\\
+\qquad \\
+Bei dem Initialen Entwurf ist jedwede Relation und Entität in diesem Schema vorhanden. Im nächsten Schritt werden alle Relationen mit dem gleichen Schlüssel zusammengefasst, dabei gilt es zu beachten, das 1:1; 1:N; N:1 Beziehungen mit Fremdschlüssel zusammen gefasst werden können. Auch sollte nach Möglichkeit Nullwerte vermieden werden. 
+
+\section{Relationale Algebra}
+\subsection{Selektion $\sigma$}
+Bei der \textit{Selektion} werden diejenigen Tupel einer Relation ausgewählt, die das sogenannte \textit{Selektionsprädikat} erfüllen.\\\qquad\\
+$\sigma_{\text{Semester>10}}$(Studenten)
+\qquad\\
+\begin{lstlisting}
+SELECT * 
+FROM Student
+WHERE Semester > 10; 
+\end{lstlisting}
+
+
+\subsection{Projektion $\Pi$}
+Extraktion von Attributen von einer Menge\\
+\qquad\\
+$\Pi_{\text{Rang}}$(Professoren)\\
+\begin{lstlisting}
+SELECT Rang
+FROM Professoren
+\end{lstlisting}
+
+\subsection{Kartesisches Produkt $\times$}
+$R\times S$ enthält alle möglichen Paare von Tupel aus $R$ und $S$.
+\begin{lstlisting}
+SELECT * 
+FROM Professoren, Assistenten
+\end{lstlisting}
+\subsection{Umbenennen $\rho$}
+$\rho$ wird benötigt, sofern eine Relation mehrfach verwendet wird. \qquad\\
+$\Pi_{\text{V1.Vorgänger}}(\sigma_{\text{V2.Nachfolger = 5216}\wedge\text{V1.Nachfolger = V2.Vorgänger}}(\rho_{\text{V1}}(\text{vorraussetzen})\times\rho_{\text{V2}}(\text{vorraussetzen})))$ \\
+indirekter Vorgänger von Vorlesung 5216\\
+\qquad\\
+Attributumbenennung:\\
+$\rho_{\text{Vorraussetzung} \leftarrow \text{Vorgänger}}$(voraussetzen)
+\begin{lstlisting}
+SELECT Vorgaenger AS Vorraussetzung
+FROM voraussetzen;
+\end{lstlisting}
+\subsection{weitere Möglichkeiten bei gleichen Schema}
+\subsubsection{Vereinigung $\cup$ UNION}
+Vereinigt 2 Mengen, welche projiziert wurden. 
+Union hat automatisch Duplikateliminierung! Mit union all vermeidbar. Nur Zeichenketten mit Zeichenketten vereinen.
+\begin{lstlisting}
+(SELECT Name			
+ FROM Assistenten)			
+UNION
+(SELECT Name			
+ FROM Professoren);
+\end{lstlisting}
+\subsubsection{Mengendifferenz $-$ EXCEPT}
+Es wird Tupelmenge aus S von Tupelmenge aus R abgezogen, z. B. Matrikelnummer der Studenten subtrahiert um die Matrikelnummer der Studenten, die Prüfungen geschrieben haben -> wer hat noch keine Prüfung abgelegt?
+
+\subsubsection{Schnittmenge $\cap$ INTERSECT}
+Schnittmenge der Tupelmenge zweier Relationen mit gleichem Schema $rightarrow$ Selektion der Tupel, die beide Relationen enthalten.\\
+$\Pi_{\text{PersNr}}(\rho_{\text{PersNr}\leftarrow\text{gelesenVon}}(\text{Vorlesungen}))\cap\Pi_{\text{PersNr}}(\sigma_{\text{Rang}=\text{C4}}(\text{Professoren}))$
+
+\subsubsection{Division $\div$ }
+$R\div S$ \\
+Es bleiben alle Elemente von $R$ übrig die vollständig gejoint werden können mit $S$.
+
+\subsubsection{Gruppierung und Aggregation $\gamma$}
+$\gamma_{\text{Semester; \textbf{COUNT(*)}}}(\text{Studenten})$\\
+Zählt die Studenten basierend auf deren Semesterwert. Also, wie viele Studenten gibt es in den entsprechenden Semestern. 
+
+\subsection{Joins}
+\subsubsection{natürlicher Join $\bowtie$}
+$R \bowtie S$\\
+Kreuzprodukt über Gleichnamige Attributspalten
+\subsubsection{Theta-Join $\bowtie_{\Theta}$}
+$R \bowtie_{\Theta} S$\\
+$\Theta$ wird ersetzt mit einer Selektion, Projektion oder Umbenennung. Damit die Tabellen entsprechend vor dem Join angepasst und verkleinert werden. 
+\subsubsection{linker äußerer Join}
+$R ~{\tiny \textifsym{d|><|}}~ S$\\
+Alles aus $R$ bleibt erhalten und Fehlende Kombinationen werden mit Null aufgefüllt. 
+\subsubsection{rechter äußerer Join}
+$R ~{\tiny \textifsym{|><|d}}~ S$\\
+Alles aus $S$ bleibt erhalten und Fehlende Kombinationen werden mit Null aufgefüllt. 
+\subsubsection{äußerer Join}
+$R ~{\tiny \textifsym{d|><|d}}~ S$\\
+Alles aus $R$ und $S$ bleibt erhalten und Fehlende Kombinationen werden mit Null aufgefüllt. 
+\subsubsection{Semi-Join}
+$R \ltimes S$\\
+Passende Elemente aus $R$ bleiben erhalten und nur aus $R$ \\
+\qquad\\
+$R \rtimes S$\\
+Passende Elemente aus $S$ bleiben erhalten und nur aus $S$
+\subsubsection{Anti-Semi Join}
+$R \triangleright S$\\
+NICHT passende Elemente aus $R$ bleiben erhalten und nur die aus $R$. \\
+\qquad\\
+$R \triangleleft S$\\
+NICHT passende Elemente aus $S$ bleiben erhalten und nur die aus $S$. 
+\section{Tupelkalkül}
+generische Form: $\{t|P(t)\}$\\
+Um sichere Anfragen gestalten zu können benötigt man eine Domäne. Dies schränkt die Menge auf eine endliche Menge ein.\\
+Anfrage auf alle C4 Professoren: $\{p~|~p\in \text{Professoren} \wedge \underbrace{\text{p.Rang = 'C4'}}_{\text{Domäne}}\}$
+\begin{lstlisting}
+SELECT * 
+FROM Professoren
+WHERE Rang = 'C4'
+\end{lstlisting}
+\begin{enumerate}
+\item Das Tupel $p$ muss in der Relation $Professoren$ enthalten sein.
+\item Das Tupel $p$ muss für das Attribut $Rang$ den Wert 'C4' besitzen. 
+\end{enumerate}
+Anfragen können auch mit Quantifizierungen gestellt werden.\\
+\qquad\\
+$\exists t \in R(Q(t))$ bzw. $\forall t \in R(Q(t))$\\
+Studenten, welche mindestens eine Vorlesung bei 'Curie' gehört haben.\\
+$\{s~|~s \in \text{Studenten}\\
+\text{\qquad}\wedge \exists h \in \text{hören}(\text{s.MartNr=h.MatrNr}\\
+\text{\qquad } \wedge \exists v \in \text{Vorlesungen}(\text{h.VorlNr=v.VorlNr}\\
+\text{\qquad } \wedge \exists p \in \text{Professoren}(\text{v.PersNr=v.gelesenVon}\\
+\text{\qquad } \wedge \text{p.Name = 'Curie'})))\}$
+\begin{lstlisting}
+SELECT s.Name
+FROM Studenten s, hoeren h, Vorlesungen v, Professoren p
+WHERE s.MatrNr = h.MatrNr AND h.VorlNr = v.VorlNr 
+AND p.PersNr = v.gelesenVon AND p.Name = 'Curie';
+\end{lstlisting}
+\section{Domänenkalkül}
+Struktur: $\{[v_1,v_2,\dots,v_n]~|~P(v_1,\dots,v_n)\}$\\
+\qquad\\
+$v_1,v_2,\dots,v_n$ sind die Attribute welche man erhalten will. $P(v_1,\dots,v_n)$ ist die genaue Anfragenkonstruktion, hier müssen alle Attribute eine eindeutige Variable bekommen. \\
+\qquad\\
+Implizite Angabe der Joins über die gleiche Variablenbelegung. explizit durch Gleichsetzung der Impliziten Variablen. \\
+\qquad\\
+$\{[n] ~ | ~ \exists s([m,n,s]\in Studenten \\ 
+\text{\qquad}\wedge \exists v([m,v]\in hoeren \\
+\text{\qquad}\wedge \exists p ([v,t,sw,p] \in Vorlesungen \\
+\text{\qquad}\wedge \exists a ([p,a,r,b] \in Professoren \wedge a = 'Curie'))))\}$
+
+\section{Quantoren Umwandlung}
+$\forall t\in R(P(t)) = \neg(\exists t \in R(\neg P(t)))$\\
+$\exists t\in R(P(t)) = \neg(\forall t \in R(\neg P(t)))$

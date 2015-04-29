@@ -1,0 +1,168 @@
+\chapter{Relationale Entwurfstheorie}
+\section{Funktionale Abhängigkeiten}
+Eine funktionale Abhängigkeit stellt eine Bedingung an die möglichen gültigen Ausprägungen des Datenbankschemas dar. \\
+
+Darstellung: $\alpha \rightarrow \beta$ Dies bedeutet, das $\alpha$ $\beta$ funktional bestimmt. Also man kann von $\alpha$ direkt auf $\beta$ schließen. Somit is $\alpha$ die Determinante von $\beta$. Dabei ist zu beachten, das $\alpha$ und $\beta$ Mengen von Attributen Repräsentieren.\\ 
+
+Funktionale Abhängigkeiten stellen Konsistenzbedingungen dar, die zu allen Zeiten in jedem (gültigen) Datenbankzustand eingehalten werden müssen. \\
+
+\section{Schlüssel}
+\subsection{Superschlüssel}
+$\alpha \subseteq R$ ist ein Superschlüssel, falls gilt\\
+\[\alpha\rightarrow R\]
+Also $\alpha$ bestimmt alle anderen Attributwerte. Dabei gilt zu beachten, dass
+\[R\rightarrow R\]
+Also bildet die Menge aller Attribute einer Relation einen Superschlüssel. Das heißt, Superschlüssel sind nicht minimal und jede Funktionale Abhängigkeit, von der aus man alle anderen Attribute erreichen kann sind Superschlüssel.
+\subsection{Kandidatenschlüssel} 
+Kandidatenschlüssel sind Superschlüssel mit folgenden Eigenschaften. 
+\begin{enumerate}
+\item $\alpha \rightarrow \beta$ d.h. $\beta$ ist funktional abhängig von $\alpha$
+\item $\alpha$ kann nicht mehr \glqq verkleinert\grqq   ~werden. Dies gilt nach Anwendung der Kanonischen Überdeckung.
+\end{enumerate}
+\subsection{Primärschlüssel}
+Ein Primärschlüssel ist ein ausgewählter Kandidatenschlüssel. Denn alle Kandidatenschlüssel können als Primärschlüssel herhalten. 
+\section{Bestimmung Funktionaler Abhängigkeiten}
+Durch Überlegen und scharfes hinsehen können FD's erarbeitet werden aus einem vorherigen Relationalen Schema. Oder durch ermitteln der Attributhülle. \\
+Dann ermittelt man die Attributhüllen der einzelnen Funktionalen Abhängigkeiten. Beispiel:\\
+Man gehe von F' = \{AB$\rightarrow$C, AB$\rightarrow$D, A$\rightarrow$E, E$\rightarrow$D, AD$\rightarrow$A, AD$\rightarrow$F\} aus.
+
+Erstelle Attributhülle von A:
+\begin{enumerate}
+\item  A ist auf alle Fälle immer erreichbar, wenn A gegeben ist, daher ist A in der Attributhülle.
+\item Der nächste nur durch A erreichbare Buchstabe ist E (A->E). E wird zur Attributhülle gegeben
+\item Nachdem E jetzt vorhanden ist, kann ich auch D erreichen (E->D). D zur Attributhülle hinzufügen.
+\item Da A und D vorhanden sind, kann nun auch F hinzugefügt werden (AD->F).
+
+\end{enumerate}
+
+Also Attributhülle von A ist somit AEDF
+
+
+Erstelle Attributhülle von B:
+\begin{enumerate}
+\item  B ist auf alle Fälle immer erreichbar, wenn B gegeben ist, daher ist B in der Attributhülle.
+\item  Sonst ist nichts mehr erreichbar.
+\end{enumerate}
+ 
+
+Attributhülle von B ist somit B
+
+
+Erstelle Attributhülle von D:
+\begin{enumerate}
+\item D ist auf alle Fälle immer erreichbar, wenn D gegeben ist, daher ist D in der Attributhülle.
+\end{enumerate}
+Attributhülle von D ist somit D
+
+\subsection{kanonische Überdeckung}
+\begin{enumerate}
+\item Linksreduktion: Überprüfe in jeder funktionalen Abhängigkeit $ \alpha \rightarrow \beta \in F $ ob $ A \in \alpha $ überflüssig ist
+\subitem Wenn $ \beta \subseteq AttrHuelle(F,\alpha - A) $, dann ist A überflüssig. Ersetzte $ \alpha \rightarrow \beta $ durch $ (\alpha - A)\rightarrow \beta $
+\item Rechtsreduktion: Überprüfe in jeder funktionalen Abhängigkeit $ \alpha \rightarrow \beta \in F' $ ob $ B \in \beta $ überflüssig ist
+\subitem Wenn $ B \in AttrHuelle(F' - (\alpha \rightarrow \beta) \cup (\alpha \rightarrow (\beta - B)), \alpha) $, dann ist B überflüssig. Ersetzte $ \alpha \rightarrow \beta $ durch $ \alpha \rightarrow (\beta - B) $
+\item Entferne alle $ \alpha \rightarrow \empty $ für beliebige $ \alpha $
+\item Vereinige alle $ \alpha \rightarrow \beta_i $ zu $ \alpha \rightarrow (\beta_1 \cup \ldots \cup \beta_n ) $
+\end{enumerate}
+Umgangssprachlich formuliert:
+\begin{itemize}
+\item Komme ich, falls ich etwas streiche, direkt auf meine Attributhülle? Wenn ja, streiche es. Falls nein lasse es drinnen. Führe diesen Schritt für alle links und rechts aus, bis alles minimal ist. 
+\item Streiche leere FD's 
+\item Füge gleiche Linke Seiten zusammen und deren rechten Seiten. 
+\end{itemize}
+\section{\glqq Schlechte \grqq Relationschemata}
+Schlecht entworfene Relationenschemata können zu sogenannten $Anomalien$ führen.
+\subsection{Updateanomalie}
+Lediglich ein kleiner Teil der Daten werden auf den neusten Stand gebracht, da das Schemata schlecht entworfen wurde. Folgen:
+\begin{enumerate}
+\item Erhöhter Speicherbedarf wegen der redundant zu speichernden Informationen
+\item Leistungseinbußen bei Änderungen, da mehrere Einträge abgeändert werden müssen. 
+\end{enumerate}
+\subsection{Einfügeanomalien}
+Es kann zu unnötigen NULL Werten oder zum zwangsweise einfügen von unnötig Redundaten Daten kommen. 
+\subsection{Löschanomalien}
+Nicht alle zu löschenden Daten werden oder können gelöscht werden, da sonst starke Inkonsistenzen entstehen, teilweise müssen die Daten mit NULL ersetzt werden. 
+
+\section{Zerlegung von Relationen}
+Um diese schlechten Schemata zu vermeiden sollten Relationen Zerlegt werden um diese in die passende Normalform zu bringen. Dabei gilt es folgendes zu beachten. 
+\begin{enumerate}
+\item $Verlustlosigkeit$ Die in der ursprünglichen Relation enthaltenen Informationen müssen rekonstruierbar sein. 
+\item $Abhängigkeitserhaltend$ Die geltenden funktionalen Abhängigkeiten müssen auf das neue Schemata übertragbar sein. (hüllentreue Dekomposition.)
+\end{enumerate}
+
+\section{Erste Normalform}
+\begin{enumerate}
+\item alle Attribute haben atomare Wertebereiche.
+\end{enumerate}
+Die Attribute enthalten keine Mengen, jedoch sind Verschachtelungen erlaubt.
+\section{Zweite Normalform} 
+Eine Relation mit zugehörigen FD's ist in zweiter Normalform, falls jedes Nichtschlüssel Attribut $A \in R$ voll funktional abhängig ist von jedem Kandidatenschlüssel. Jedoch können dadurch jede Kombination von Attributen, welche voll funktional abhängig sind in einer Tabelle gespeichert werden, dies führt noch immer zu Anomalien. (Sieht aus wie ein $\times$ von zwei Tabellen *würgs*)
+\section{Dritte Normalform}
+Ein Relationenschema $R$ ist in $dritter Normalform$, wenn für jede für $R$ geltende funktionale Abhängigkeit der Form $\alpha \rightarrow B$ mit $\alpha \subseteq R$ und $B \in R$ mindestens eine von drei Bedingungen gilt: 
+\begin{enumerate}
+\item $B \in \alpha$ d.h. die D ist trivial
+\item Das Attribut §B§ ist in einem Kandidatenschlüssel von $R$ enthalten
+\item $\alpha$ ist Superschlüssel von $R$
+\end{enumerate}
+Wie bekommt man nun die dritte Normalform hin?
+\begin{itemize}
+\item Ziel = Synthesealgorithmus sorgt dafür, dass
+\subitem R1, …., Rn verlustlose Zerlegung von R ist
+\subitem Alle Abhängigkeiten bewahrt werden
+\subitem Alle Ri in dritter Normalform sind
+\end{itemize}
+Synthesealgorithmus
+\begin{enumerate}
+\item Reduktion von F, d.h. die Bestimmung der kanonischen Überdeckung
+\item Erzeugen der neuen Relationenschemata aus der kanonischen Überdeckung
+\item ggf. die Hinzunahme einer Relation, die nur den Ursprungsschlüssel enthält
+\item Elimination der Schemata, die in einem anderen Schema enthalten sind
+\end{enumerate}
+\section{Boyce-Codd Normalform}
+Ein Relationenschema ist in BCNF, wenn es in der 3NF ist und jede Determinante (Attributmenge, von der andere Attribute funktional abhängen) ein Superschlüssel ist (oder die Abhängigkeit ist trivial).
+
+Die Überführung in die BCNF ist zwar immer verlustfrei möglich, aber nicht immer abhängigkeitserhaltend. Die Boyce-Codd-Normalform war ursprünglich als Vereinfachung der 3NF gedacht, führte aber zu einer neuen Normalform, die diese verschärft: Eine Relation ist automatisch frei von transitiven Abhängigkeiten, wenn alle Determinanten Schlüsselkandidaten sind.\\
+
+Um dies hinzu bekommen, benötigt man den Dekompensositionsalgorithmus
+\begin{enumerate}
+
+\item Gegeben ist ein relationales Schema $R = (\overline R, \mathcal{F}$), mit der Menge aller Attribute $\overline R$ und der Menge der funktionalen Abhängigkeiten $\mathcal{F}$ über diesen Attributen.
+\item	Die Ergebnismenge Dekomposition, bestehend aus den zerlegten Schemata, wird mit R initialisiert.
+\item	Solange es ein Schema S in der Menge Dekomposition gibt, das nicht in der BCNF ist, führe folgende Zerlegung \item Sei $\overline X\overline Y\subseteq\overline S$ eine Attributmenge für die eine funktionale Abhängigkeit $\overline X\rightarrow \overline Y $definiert ist, welche der BCNF widerspricht.
+\item Ersetze S in der Ergebnismenge Dekomposition durch zwei neue Schemata $S_1 = (\overline X\overline Y, \mathcal{F}_1$), ein Schema bestehend nur aus den Attributen der Abhängigkeit, welche die BCNF ursprünglich verletzt hat; und $S_2 = ((\overline S - \overline Y) \cup \overline X, \mathcal{F}_2$), ein Schema mit allen Attributen, außer denen die nur in der abhängigen Menge $\overline Y$ und nicht in der Determinante $\overline X$ enthalten sind. Die Menge der funktionalen Abhängigkeiten $\mathcal{F}_1$ enthält nur noch die Abhängigkeiten, welche lediglich Attribute aus$ \overline X\overline Y $ enthalten, entsprechendes gilt für $\mathcal{F}_2$. Damit fallen alle Abhängigkeiten weg, welche Attribute aus beiden Schemata benötigen.
+\item Ergebnis: Dekomposition – eine Menge von relationalen Schemata, welche in der BCNF sind.
+\end{enumerate}
+
+\section{Mehrwertige Abhängigkeiten}
+Mehrwertige Abhängigkeiten sind eine Verallgemeinerung funktionaler Abhängigkeiten, d.h. jede FD ist auch eine MVD, aber nicht umgekehrt. Beispiel:\\
+\begin{tabular}{|c|c|c|}
+\hline PersNr & Sprache & Programmiersprache \\ 
+\hline 3002 & griechisch & C \\ 
+3002 & lateinisch & Pascal \\ 
+ 3002 & griechisch & Pascal \\ 
+ 3002 & lateinisch & C \\ 
+ 3005 & deutsch & Ada \\ 
+ \hline
+\end{tabular} \\ \qquad\\
+Hier sind eindeutig Redundanzen zu erkennen welche eliminiert werden müssen. Denn die Personalnummer und die natürliche Sprache ermitteln zusammen die Programmiersprache aber auch die Personalnummer in Verbindung mit der Programmiersprache ergibt die natürliche Sprache. Daher definiert die Personalnummer zum einen die natürliche Sprache als auch die Programmiersprache. jedoch erst in Kombination kann es funktionieren. Diese MVD's zu beseitigen zerlegt man diese Tabelle in 2 Tabellen, wo nur noch die Personalnummer entscheidend ist. 
+
+\section{Vierte Normalform}
+
+Relation R mit Menge D von FD’s und MVD’s ist in 4NF, wenn für jede MVD $\alpha \twoheadrightarrow \beta$ der Hülle D$^{+}$ gilt
+MVD ist trivial ODER
+Alpha ist Superschlüssel von R
+$\rightarrow$ gleiche Bedingungen wie BCNF! Nur allgemeiner durch MVD (Überdeckung)
+
+Vorgehen:
+
+\begin{enumerate}
+\item Zerlege die Schemata in die passenden Abhängigkeiten
+\subitem achte zunächst noch nicht auf MVD und bilde diese zusammen 
+\item Zerlege als nächstes die MVD's in eigene Schemata. 
+\end{enumerate}
+
+\section{Zusammenfassung}
+\begin{itemize}
+\item 1 NF < 2 NF < 3 NF < BCNF < 4 NF
+\item Die Verlustlosigkeit ist überall gewährleistet
+\item Die Abhängigkeitserhaltung kann nur bei den Zerlegungen bis zur dritten Normalform garantiert werden. 
+\end{itemize}
